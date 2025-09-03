@@ -1,60 +1,81 @@
 <!doctype html><html lang="fr"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Shift 90</title>
-<link rel="manifest" href="manifest.webmanifest">
-<style>
-:root{--bg:#0b1220;--card:#121a2b;--txt:#e6ecff;--muted:#92a0c6;--accent:#61dafb}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto}
-.wrap{max-width:540px;margin:0 auto;padding:14px}
-.h1{font-size:20px;font-weight:700;margin:8px 0}
-.tabs{display:flex;gap:8px;margin:6px 0 12px}
-.tab{flex:1;padding:10px;border-radius:12px;background:var(--card);text-align:center;color:var(--muted)}
-.tab.active{outline:2px solid var(--accent);color:var(--txt)}
-.card{background:var(--card);border-radius:16px;padding:12px;margin:10px 0}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:8px 0}
-.chk{display:flex;gap:10px;flex-wrap:wrap}
-.chk label{background:#0f1a33;padding:10px 12px;border-radius:12px}
-.btn{display:block;width:100%;padding:12px;border-radius:12px;background:var(--accent);color:#000;text-align:center;font-weight:700;margin-top:10px}
-.note{width:100%;padding:10px;border-radius:10px;background:#0f1a33;border:0;color:var(--txt)}
-.small{color:var(--muted);font-size:12px}
-</style>
-<script> 'serviceWorker' in navigator && navigator.serviceWorker.register('./sw.js'); </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shift90 Pro</title>
+<link rel="manifest" href="manifest.webmanifest?v=1">
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="theme-color" content="#0b1220">
+<script>
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=1');
+</script>
 </head><body>
-<div class="wrap">
-  <div class="h1">Shift 90 • <span id="dayLabel"></span></div>
-  <div class="card" id="headerCard">
-    <div class="row"><div>Streak: <b id="streak">0</b> jours</div><div>Score: <b id="score">0%</b></div></div>
-    <div class="small">Valide chaque moment. Notes privées, stockées sur l’appareil.</div>
+<header class="top">
+  <h1>Shift90 <span id="phase"></span></h1>
+  <div class="kpis">
+    <div><b id="dayLabel"></b></div>
+    <div>Score <b id="score">0%</b></div>
+    <div>Streak <b id="streak">0</b></div>
+    <div>Énergie <b id="energy">0</b></div>
   </div>
+</header>
 
-  <div class="tabs">
-    <div class="tab active" data-m="morning">Matin</div>
-    <div class="tab" data-m="noon">Après-midi</div>
-    <div class="tab" data-m="evening">Soir</div>
-  </div>
+<nav class="tabs">
+  <button class="tab active" data-view="day">Jour</button>
+  <button class="tab" data-view="week">Semaine</button>
+  <button class="tab" data-view="phase">Phase</button>
+  <button class="tab" data-view="data">Données</button>
+</nav>
 
-  <div class="card" id="momentCard">
-    <div class="chk" id="checks"></div>
-    <textarea class="note" id="note" rows="3" placeholder="Note rapide…"></textarea>
-    <div class="btn" id="saveBtn">Valider ce moment</div>
-    <div class="small" id="status"></div>
-  </div>
+<main id="view-day" class="view active">
+  <section class="card">
+    <div class="moments">
+      <button class="pill active" data-m="morning">Matin</button>
+      <button class="pill" data-m="noon">Après-midi</button>
+      <button class="pill" data-m="evening">Soir</button>
+    </div>
+    <div id="sliders"></div>
+    <textarea id="note" rows="4" placeholder="Note du moment…"></textarea>
+    <input id="tags" placeholder="tags, séparés, par, virgules">
+    <button id="saveMoment" class="primary">Valider le moment</button>
+    <div class="hint" id="hint"></div>
+  </section>
 
-  <div class="card">
-    <div class="row"><div>Rappels</div></div>
-    <div class="row small">Matin <input id="r_m" type="time"> • Après-midi <input id="r_n" type="time"> • Soir <input id="r_e" type="time"></div>
-    <div class="btn" id="saveRem">Enregistrer les rappels</div>
-  </div>
-</div>
-  <div class="card">
-  <div class="row"><div>Score: <b id="score">0%</b></div><div>Streak: <b id="streak">0</b></div></div>
-</div>
-<div class="card">
-  <div id="sliders"></div>
-  <input id="tags" placeholder="tags séparés par des virgules">
-  <textarea id="note" rows="4" placeholder="note longue…"></textarea>
-  <div class="btn" id="saveNote">Enregistrer</div>
-  <div class="small" id="status"></div>
-</div> 
-<script src="app.js"></script>
+  <section class="card">
+    <h3>Rappels</h3>
+    <div class="rem">
+      <label>Matin <input id="r_m" type="time"></label>
+      <label>Après-midi <input id="r_n" type="time"></label>
+      <label>Soir <input id="r_e" type="time"></label>
+    </div>
+    <button id="saveRem" class="ghost">Enregistrer</button>
+  </section>
+</main>
+
+<main id="view-week" class="view">
+  <section class="card">
+    <h3>Semaine courante</h3>
+    <div id="heatmap" class="grid"></div>
+    <div class="row"><span>EMA7</span><b id="ema7">0%</b></div>
+    <div class="row"><span>Variance</span><b id="var7">0</b></div>
+  </section>
+</main>
+
+<main id="view-phase" class="view">
+  <section class="card">
+    <h3>Phase</h3>
+    <canvas id="chart" height="220"></canvas>
+  </section>
+</main>
+
+<main id="view-data" class="view">
+  <section class="card">
+    <button id="exportJson" class="ghost">Exporter JSON</button>
+    <button id="exportCsv" class="ghost">Exporter CSV</button>
+    <button id="resetApp" class="danger">Réinitialiser (local)</button>
+    <div class="hint">Données privées. Rien n’est envoyé en ligne.</div>
+  </section>
+</main>
+
+<script type="module" src="app.js?v=1"></script>
 </body></html>
