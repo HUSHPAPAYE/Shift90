@@ -1,0 +1,9 @@
+{
+  "name": "Shift 90 — v3",
+  "short_name": "Shift 90",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071228",
+  "theme_color": "#09142b",
+  "icons": [{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]
+}
